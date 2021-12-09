@@ -25,6 +25,8 @@ const timeLeft = document.getElementById("time-left");
 
 let timerIdAutoHideBottomContainer;
 
+let shallStartDisplayingInternetAvailableMessage = false;
+let connectionManagerSubscriptionHandle;
 let isInternetAvailable;
 
 let lastFocusedVideoItem;
@@ -48,15 +50,15 @@ function initialize() {
 	handleKeyEvents();
 
 	registerVisibilityChangeHandler();
-	//registerNetworkStateChangeListener();
+	registerNetworkStateChangeListener();
 
-	try {
+	/* try {
 		duid = webapis.productinfo.getDuid();
 		console.log("DUID: " + duid);
 	}
 	catch (error) {
 		console.log("An error occured while getting the DUID: " + error.message);
-	}
+	} */
 
 	wsfPlayer.setVideoElement(document.getElementById("wsf-video"));
 
@@ -208,9 +210,10 @@ function handleKeyEvents() {
 				}
 
 				if (!collectionsScreen.classList.contains("hidden")) {
-					displayExitConfirmationPopup();
+					//displayExitConfirmationPopup();
+					webOS.platformBack();
 
-					return;
+					//return;
 				}
 
 				break;
@@ -416,32 +419,39 @@ function registerVisibilityChangeHandler() {
 
 
 function registerNetworkStateChangeListener() {
-	webapis.network.addNetworkStateChangeListener(function(value) {
-		if (value == webapis.network.NetworkState.GATEWAY_DISCONNECTED) {
-			//log("offline");
-			
-			isInternetAvailable = false;    	    		  	        		
-			if (!playingScreen.classList.contains("hidden")) {
-				wsfPlayer.pause();
-
-				displayBottomContainer();
-			}
-			displayStickyMessage(INTERNET_CONNECTION_LOST);
-			
-		} 
-		else if (value == webapis.network.NetworkState.GATEWAY_CONNECTED) {
-			//log("online");
-			
-			isInternetAvailable = true;
-			removeStickyMessage();
-			displayMessage(INTERNET_CONNECTION_RESTORED);
-			if (!playingScreen.classList.contains("hidden")) {
-				wsfPlayer.videoElement.play();
-
-				autoHideBottomContainer();
-			}  	    			        		
-		}
-	});
+	connectionManagerSubscriptionHandle = webOS.service.request("luna://com.webos.service.connectionmanager", {
+    	method: "getStatus",
+      	parameters: { subscribe: true },
+      	onSuccess: function (inResponse) {
+        	isInternetAvailable = inResponse.isInternetConnectionAvailable;
+        	if (isInternetAvailable) {
+				if (shallStartDisplayingInternetAvailableMessage) {
+					removeStickyMessage();
+					displayMessage(INTERNET_CONNECTION_RESTORED);
+				}						   		
+          		if (!playingScreen.classList.contains("hidden")) {
+            		wsfPlayer.videoElement.play();
+            		autoHideBottomContainer();
+          		}
+        	} 
+			else {
+				shallStartDisplayingInternetAvailableMessage = true;
+          		if (!playingScreen.classList.contains("hidden")) {
+            		wsfPlayer.pause();
+            		displayBottomContainer();
+          		}
+          		displayStickyMessage(INTERNET_CONNECTION_LOST);
+        	}
+        	return;
+      	},
+      	onFailure: function (inError) {
+        	console.log("Failed to get network state [" + inError.errorCode + "]: " +
+            inError.errorText
+        );
+        return;
+      },
+    }
+  );
 }
 
 

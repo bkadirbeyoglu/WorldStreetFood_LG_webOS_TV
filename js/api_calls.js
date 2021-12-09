@@ -9,7 +9,7 @@
 }; */
 
 //const URL_ROKU_XML = "http://rokuawgserver.ddns.net/ctv/channels/1/roku.xml";
-const URL_ROKU_XML = "https://raw.githubusercontent.com/bkadirbeyoglu/WorldStreetFood/master/data/roku.xml";
+const URL_ROKU_XML = "https://raw.githubusercontent.com/bkadirbeyoglu/WorldStreetFood_LG_webOS_TV/main/data/roku.xml";
 
 let playlists = [];
 
@@ -51,6 +51,7 @@ function getChannelXML() {
                 //getCollectionList();
                 buildCollectionsScreen();
                 displayCollectionsScreen();
+                hasDataBeenLoadedAndCollectionsScreenShownAtStartup = true;
 			}
         })
         .catch(err => {

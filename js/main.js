@@ -25,8 +25,7 @@ const timeLeft = document.getElementById("time-left");
 
 let timerIdAutoHideBottomContainer;
 
-let shallStartDisplayingInternetAvailableMessage = false;
-let connectionManagerSubscriptionHandle;
+let hasDataBeenLoadedAndCollectionsScreenShownAtStartup = false;
 let isInternetAvailable;
 
 let lastFocusedVideoItem;
@@ -419,28 +418,29 @@ function registerVisibilityChangeHandler() {
 
 
 function registerNetworkStateChangeListener() {
-	connectionManagerSubscriptionHandle = webOS.service.request("luna://com.webos.service.connectionmanager", {
+	webOS.service.request("luna://com.webos.service.connectionmanager", {
     	method: "getStatus",
       	parameters: { subscribe: true },
-      	onSuccess: function (inResponse) {
+      	onSuccess: function(inResponse) {
         	isInternetAvailable = inResponse.isInternetConnectionAvailable;
         	if (isInternetAvailable) {
-				if (shallStartDisplayingInternetAvailableMessage) {
+				if (hasDataBeenLoadedAndCollectionsScreenShownAtStartup) {
 					removeStickyMessage();
-					displayMessage(INTERNET_CONNECTION_RESTORED);
-				}						   		
-          		if (!playingScreen.classList.contains("hidden")) {
-            		wsfPlayer.videoElement.play();
-            		autoHideBottomContainer();
-          		}
+					displayMessage(INTERNET_CONNECTION_RESTORED);				   		
+					if (!playingScreen.classList.contains("hidden")) {
+						wsfPlayer.videoElement.play();
+						autoHideBottomContainer();
+					}
+				}
         	} 
 			else {
-				shallStartDisplayingInternetAvailableMessage = true;
-          		if (!playingScreen.classList.contains("hidden")) {
-            		wsfPlayer.pause();
-            		displayBottomContainer();
-          		}
-          		displayStickyMessage(INTERNET_CONNECTION_LOST);
+				if (hasDataBeenLoadedAndCollectionsScreenShownAtStartup) {
+					if (!playingScreen.classList.contains("hidden")) {
+						wsfPlayer.pause();
+						displayBottomContainer();
+					  }
+					  displayStickyMessage(INTERNET_CONNECTION_LOST);
+				}
         	}
         	return;
       	},
@@ -500,7 +500,7 @@ function secondsToHHMMSS(totalSeconds) {
   	var result = (hours < 10 ? "0" + hours : hours);
     result += ":" + (minutes < 10 ? "0" + minutes : minutes);
     result += ":" + (seconds  < 10 ? "0" + seconds : seconds);
-  	
+
 	return result;
 }
 

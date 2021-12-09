@@ -190,7 +190,7 @@ function handleKeyEvents() {
 			}
 
 			// Back
-			case 10009: {	
+			case 461: {	
 				if (!playingScreen.classList.contains("hidden")) {
 					wsfPlayer.stop();
 
@@ -328,7 +328,8 @@ function handleEnterKey() {
 		return;
 	}
 	if (activeElement.id == "exit-confirmation-button-yes") {
-		tizen.application.getCurrentApplication().exit();
+		hideExitConfirmationPopup();
+		webOS.platformBack();
 		
 		return;
 	}

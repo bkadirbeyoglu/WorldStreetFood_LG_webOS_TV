@@ -491,7 +491,7 @@ function removeStickyMessage() {
 
 
 function secondsToHHMMSS(totalSeconds) {
-	//console.log(totalSeconds);
+	console.log("totalSeconds: " + totalSeconds);
 	totalSeconds = Number(totalSeconds);
 	var hours = Math.floor(totalSeconds / 3600);
     var minutes = Math.floor(totalSeconds % 3600 / 60);

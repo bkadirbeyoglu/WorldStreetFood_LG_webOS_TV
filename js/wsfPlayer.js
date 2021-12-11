@@ -127,7 +127,7 @@ let wsfPlayer = {
 			})
 
 			videoEl.addEventListener("timeupdate", function() {
-				if (videoEl.currentTime >= 0 && videoEl.duration >= 0) {
+				if (videoEl.currentTime >= 0 && videoEl.duration >= 0) {
 					let value = (videoEl.currentTime / videoEl.duration) * 100.0;
 					wsfPlayer.posValueAsPercentage = value;
 					progress.style.width = (value * 15.00) + "px";

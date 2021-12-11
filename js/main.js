@@ -9,6 +9,7 @@ const REWIND_FAST_FORWARD_DEFAULT_STEP_IN_SECONDS = 20;
 const playingScreen = document.getElementById("playing-screen");
 const collectionsScreen = document.getElementById("collections-screen");
 const loadingScreen = document.getElementById("loading-screen");
+const splashScreen = document.getElementById("splash-screen");
 const exitConfirmationPopup = document.getElementById("exit-confirmation-popup");
 
 const divVideoTitle = document.getElementById("video-title");
@@ -340,11 +341,15 @@ function handleEnterKey() {
 
 function displayCollectionsScreen() {
 	hideLoadingScreen();
+	splashScreen.classList.add("hidden");
 	playingScreen.classList.add("hidden");
 	collectionsScreen.classList.remove("hidden");
 
 	if (lastFocusedVideoItem != undefined) {
 		SpatialNavigation.focus(lastFocusedVideoItem);
+	}
+	else {
+		SpatialNavigation.focus("#c0-v0");
 	}
 }
 
